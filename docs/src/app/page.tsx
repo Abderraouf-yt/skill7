@@ -3,6 +3,8 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import skillsData from "@/data/skills.json";
+import GradientText from "@/components/visuals/GradientText";
+import Antigravity from "@/components/visuals/Antigravity";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -202,12 +204,20 @@ export default function Home() {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 group cursor-default">
-              <div className="relative w-10 h-10 transition-transform group-hover:scale-110 duration-500">
-                <Image src="/logo.svg" alt="Logo" width={40} height={40} className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(139,92,246,0.5)]" />
-              </div>
+              <Antigravity range={6} duration={4}>
+                <div className="relative w-10 h-10 transition-transform group-hover:scale-110 duration-500">
+                  <Image src="/logo.svg" alt="Logo" width={40} height={40} className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(139,92,246,0.5)]" />
+                </div>
+              </Antigravity>
               <div className="flex flex-col">
                 <h1 className="text-lg font-bold tracking-tight text-foreground">
-                  Antigravity Skills
+                  <GradientText
+                    colors={["#e2e8f0", "#a78bfa", "#3b82f6", "#e2e8f0"]}
+                    animationSpeed={6}
+                    className="text-lg font-bold tracking-tight"
+                  >
+                    Antigravity Skills
+                  </GradientText>
                 </h1>
                 <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">{skills.length} EXPERT MODULES</p>
               </div>
