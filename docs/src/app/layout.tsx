@@ -9,13 +9,14 @@ export const metadata: Metadata = {
   description: "Browse and search 634+ production-ready AI development skills for security, development, infrastructure, and more.",
   keywords: ["MCP", "AI skills", "development", "security", "infrastructure", "Gemini CLI", "Claude", "Cursor"],
   icons: {
-    icon: "/favicon.svg",
+    icon: "/skills-mcp-server/favicon.svg",
   },
   openGraph: {
     title: "Antigravity Skills",
     description: "634+ AI development skills for any MCP-compatible client",
     type: "website",
     url: "https://abderraouf-yt.github.io/skills-mcp-server",
+    images: ["/skills-mcp-server/favicon.svg"],
   },
 };
 
