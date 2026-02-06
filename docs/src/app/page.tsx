@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import skillsData from "@/data/skills.json";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -86,6 +87,9 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<typeof skills[0] | null>(null);
+  const [focusedIndex, setFocusedIndex] = useState(0);
+  const parentRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   // Compute categories from inferred categories
   const categories = useMemo(() => {
@@ -108,6 +112,84 @@ export default function Home() {
     });
   }, [search, selectedCategory]);
 
+  // Virtualized list - 3 columns, 180px row height
+  const COLUMNS = 3;
+  const rowCount = Math.ceil(filteredSkills.length / COLUMNS);
+
+  const rowVirtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 180,
+    overscan: 5,
+  });
+
+  // Keyboard navigation
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (selectedSkill) {
+      if (e.key === "Escape") {
+        setSelectedSkill(null);
+      }
+      return;
+    }
+
+    // Don't navigate while typing in search
+    if (document.activeElement === searchRef.current) {
+      if (e.key === "Escape") {
+        searchRef.current?.blur();
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case "j":
+      case "ArrowDown":
+        e.preventDefault();
+        setFocusedIndex(i => Math.min(i + COLUMNS, filteredSkills.length - 1));
+        break;
+      case "k":
+      case "ArrowUp":
+        e.preventDefault();
+        setFocusedIndex(i => Math.max(i - COLUMNS, 0));
+        break;
+      case "l":
+      case "ArrowRight":
+        e.preventDefault();
+        setFocusedIndex(i => Math.min(i + 1, filteredSkills.length - 1));
+        break;
+      case "h":
+      case "ArrowLeft":
+        e.preventDefault();
+        setFocusedIndex(i => Math.max(i - 1, 0));
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (filteredSkills[focusedIndex]) {
+          setSelectedSkill(filteredSkills[focusedIndex]);
+        }
+        break;
+      case "/":
+        e.preventDefault();
+        searchRef.current?.focus();
+        break;
+    }
+  }, [selectedSkill, filteredSkills, focusedIndex]);
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
+  // Scroll focused item into view
+  useEffect(() => {
+    const rowIndex = Math.floor(focusedIndex / COLUMNS);
+    rowVirtualizer.scrollToIndex(rowIndex, { align: "auto" });
+  }, [focusedIndex, rowVirtualizer]);
+
+  // Reset focus when filter changes
+  useEffect(() => {
+    setFocusedIndex(0);
+  }, [search, selectedCategory]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex flex-col">
       {/* Header */}
@@ -125,11 +207,17 @@ export default function Home() {
             </div>
             <div className="flex-1 max-w-md">
               <Input
-                placeholder="Search skills..."
+                ref={searchRef}
+                placeholder="Search skills... (press /)"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="bg-slate-800/50 border-white/10 focus:border-violet-500/50"
               />
+            </div>
+            <div className="hidden md:flex items-center gap-2 text-xs text-slate-500">
+              <kbd className="px-1.5 py-0.5 bg-slate-800 rounded">↑↓</kbd> navigate
+              <kbd className="px-1.5 py-0.5 bg-slate-800 rounded">Enter</kbd> open
+              <kbd className="px-1.5 py-0.5 bg-slate-800 rounded">Esc</kbd> close
             </div>
             <Button
               variant="outline"
@@ -180,7 +268,7 @@ export default function Home() {
             </div>
           </aside>
 
-          {/* Main Grid */}
+          {/* Main Grid - Virtualized */}
           <main className="flex-1">
             <div className="mb-4 flex items-center justify-between">
               <p className="text-sm text-slate-400">
@@ -198,40 +286,71 @@ export default function Home() {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {filteredSkills.slice(0, 50).map((skill) => (
-                <Card
-                  key={skill.id}
-                  onClick={() => setSelectedSkill(skill)}
-                  className="bg-slate-800/30 backdrop-blur border-white/5 hover:border-violet-500/30 transition-all cursor-pointer group hover:shadow-lg hover:shadow-violet-500/5"
-                >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <CardTitle className="text-base text-slate-200 group-hover:text-violet-300 transition-colors line-clamp-1">
-                        {skill.name}
-                      </CardTitle>
-                      <Badge variant="outline" className={`shrink-0 text-xs ${riskColors[skill.risk] || riskColors.unknown}`}>
-                        {skill.risk}
-                      </Badge>
-                    </div>
-                    <CardDescription className="text-slate-400 line-clamp-2 text-sm">
-                      {skill.description}
-                    </CardDescription>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Badge variant="secondary" className="bg-slate-700/50 text-slate-300 text-xs">
-                        {categoryIcons[skill.inferredCategory] || "📁"} {skill.inferredCategory}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                </Card>
-              ))}
-            </div>
+            <div
+              ref={parentRef}
+              className="h-[calc(100vh-220px)] overflow-auto"
+            >
+              <div
+                style={{
+                  height: `${rowVirtualizer.getTotalSize()}px`,
+                  width: "100%",
+                  position: "relative",
+                }}
+              >
+                {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                  const startIndex = virtualRow.index * COLUMNS;
+                  const rowSkills = filteredSkills.slice(startIndex, startIndex + COLUMNS);
 
-            {filteredSkills.length > 50 && (
-              <p className="text-center text-slate-500 mt-6 text-sm">
-                Showing first 50 results. Refine your search to see more.
-              </p>
-            )}
+                  return (
+                    <div
+                      key={virtualRow.key}
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: `${virtualRow.size}px`,
+                        transform: `translateY(${virtualRow.start}px)`,
+                      }}
+                      className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 px-1"
+                    >
+                      {rowSkills.map((skill, colIndex) => {
+                        const skillIndex = startIndex + colIndex;
+                        const isFocused = skillIndex === focusedIndex;
+
+                        return (
+                          <Card
+                            key={skill.id}
+                            onClick={() => setSelectedSkill(skill)}
+                            className={`bg-slate-800/30 backdrop-blur border-white/5 hover:border-violet-500/30 transition-all cursor-pointer group hover:shadow-lg hover:shadow-violet-500/5 ${isFocused ? "ring-2 ring-violet-500 border-violet-500" : ""
+                              }`}
+                          >
+                            <CardHeader className="pb-3">
+                              <div className="flex items-start justify-between gap-2">
+                                <CardTitle className="text-base text-slate-200 group-hover:text-violet-300 transition-colors line-clamp-1">
+                                  {skill.name}
+                                </CardTitle>
+                                <Badge variant="outline" className={`shrink-0 text-xs ${riskColors[skill.risk] || riskColors.unknown}`}>
+                                  {skill.risk}
+                                </Badge>
+                              </div>
+                              <CardDescription className="text-slate-400 line-clamp-2 text-sm">
+                                {skill.description}
+                              </CardDescription>
+                              <div className="flex items-center gap-2 mt-2">
+                                <Badge variant="secondary" className="bg-slate-700/50 text-slate-300 text-xs">
+                                  {categoryIcons[skill.inferredCategory] || "📁"} {skill.inferredCategory}
+                                </Badge>
+                              </div>
+                            </CardHeader>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </main>
         </div>
       </div>
@@ -311,3 +430,4 @@ export default function Home() {
     </div>
   );
 }
+
