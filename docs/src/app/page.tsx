@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
-import { useVirtualizer } from "@tanstack/react-virtual";
 import skillsData from "@/data/skills.json";
 import { semanticSearch } from "@/lib/semanticSearch";
 import GradientText from "@/components/visuals/GradientText";
@@ -70,14 +69,14 @@ const categoryIcons: Record<string, string> = {
   "agentic-ai": "🤖",
   "llm-core": "🧠",
   "rag-knowledge": "📚",
-  "security": "�️",
+  "security": "🛡️",
   "frontend-ui": "🎨",
   "backend-infra": "⚙️",
   "automation": "⚡",
   "blockchain": "🔗",
   "data-science": "📊",
   "dev-tools": "🛠️",
-  "uncategorized": "�",
+  "uncategorized": "📦",
 };
 
 export default function Home() {
@@ -85,8 +84,10 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<typeof skills[0] | null>(null);
   const [focusedIndex, setFocusedIndex] = useState(0);
-  const parentRef = useRef<HTMLDivElement>(null);
+  const [visibleCount, setVisibleCount] = useState(24);
+
   const searchRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Compute categories from inferred categories
   const categories = useMemo(() => {
@@ -117,16 +118,15 @@ export default function Home() {
     return result;
   }, [search, selectedCategory]);
 
-  // Virtualized list - 3 columns, 180px row height
-  const COLUMNS = 3;
-  const rowCount = Math.ceil(filteredSkills.length / COLUMNS);
+  // Reset pagination when filters change
+  useEffect(() => {
+    setVisibleCount(24);
+    if (containerRef.current) {
+      containerRef.current.scrollTop = 0;
+    }
+  }, [search, selectedCategory]);
 
-  const rowVirtualizer = useVirtualizer({
-    count: rowCount,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 190, // Slightly improved height for better spacing
-    overscan: 5,
-  });
+  const visibleSkills = filteredSkills.slice(0, visibleCount);
 
   // Keyboard navigation
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -146,54 +146,17 @@ export default function Home() {
     }
 
     switch (e.key) {
-      case "j":
-      case "ArrowDown":
-        e.preventDefault();
-        setFocusedIndex(i => Math.min(i + COLUMNS, filteredSkills.length - 1));
-        break;
-      case "k":
-      case "ArrowUp":
-        e.preventDefault();
-        setFocusedIndex(i => Math.max(i - COLUMNS, 0));
-        break;
-      case "l":
-      case "ArrowRight":
-        e.preventDefault();
-        setFocusedIndex(i => Math.min(i + 1, filteredSkills.length - 1));
-        break;
-      case "h":
-      case "ArrowLeft":
-        e.preventDefault();
-        setFocusedIndex(i => Math.max(i - 1, 0));
-        break;
-      case "Enter":
-        e.preventDefault();
-        if (filteredSkills[focusedIndex]) {
-          setSelectedSkill(filteredSkills[focusedIndex]);
-        }
-        break;
       case "/":
         e.preventDefault();
         searchRef.current?.focus();
         break;
     }
-  }, [selectedSkill, filteredSkills, focusedIndex]);
+  }, [selectedSkill]);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
-
-  // Scroll focused item into view
-  useEffect(() => {
-    const rowIndex = Math.floor(focusedIndex / COLUMNS);
-    rowVirtualizer.scrollToIndex(rowIndex, { align: "auto" });
-  }, [focusedIndex, rowVirtualizer]);
-
-  // Reset focus when filter changes
-  useEffect(() => {
-    setFocusedIndex(0);
-  }, [search, selectedCategory]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans selection:bg-primary/20">
@@ -305,8 +268,8 @@ export default function Home() {
             </div>
           </aside>
 
-          {/* Main Grid - Virtualized */}
-          <main className="flex-1 min-w-0">
+          {/* Main Grid */}
+          <main className="flex-1 min-w-0" ref={containerRef}>
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-foreground tracking-tight">
                 {selectedCategory ? (
@@ -330,91 +293,76 @@ export default function Home() {
               )}
             </div>
 
-            <div
-              ref={parentRef}
-              className="h-[calc(100vh-200px)] overflow-auto pr-2"
-            >
-              <div
-                style={{
-                  height: `${rowVirtualizer.getTotalSize()}px`,
-                  width: "100%",
-                  position: "relative",
-                }}
-              >
-                {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                  const startIndex = virtualRow.index * COLUMNS;
-                  const rowSkills = filteredSkills.slice(startIndex, startIndex + COLUMNS);
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-8">
+              {visibleSkills.map((skill, index) => {
+                const isFocused = index === focusedIndex;
+                return (
+                  <div
+                    key={skill.id}
+                    onClick={() => setSelectedSkill(skill)}
+                    className={`group relative p-5 h-[200px] flex flex-col justify-between rounded-3xl border bg-card/40 backdrop-blur-xl transition-all duration-500 hover:bg-card/60 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10 cursor-pointer overflow-hidden ${isFocused
+                      ? "ring-2 ring-primary/70 border-primary/50 shadow-[0_0_30px_rgba(139,92,246,0.2)]"
+                      : "border-white/5 hover:border-primary/20"
+                      }`}
+                  >
+                    {/* Animated Gradient Mesh */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] via-transparent to-primary/[0.02] opacity-100 transition-opacity duration-700" />
+                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-purple-500/10 opacity-0 group-hover:opacity-100 transition-all duration-700 filter blur-xl" />
 
-                  return (
-                    <div
-                      key={virtualRow.key}
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: `${virtualRow.size}px`,
-                        transform: `translateY(${virtualRow.start}px)`,
-                      }}
-                      className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pb-4"
-                    >
-                      {rowSkills.map((skill, colIndex) => {
-                        const skillIndex = startIndex + colIndex;
-                        const isFocused = skillIndex === focusedIndex;
-
-                        return (
-                          <div
-                            key={skill.id}
-                            onClick={() => setSelectedSkill(skill)}
-                            className={`group relative p-5 h-full rounded-2xl border bg-card/40 backdrop-blur-xl transition-all duration-300 hover:bg-card/60 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 cursor-pointer overflow-hidden flex flex-col justify-between ${isFocused
-                              ? "ring-2 ring-primary/70 border-primary/50 shadow-[0_0_20px_rgba(139,92,246,0.15)]"
-                              : "border-white/5 hover:border-primary/20"
-                              }`}
-                          >
-                            {/* Animated Background Mesh */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-                            {/* Content */}
-                            <div className="relative z-10 flex flex-col gap-3">
-                              <div className="flex items-start justify-between gap-3">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xl filter drop-shadow-lg">{categoryIcons[skill.inferredCategory] || "📦"}</span>
-                                  <Badge variant="outline" className={`text-[9px] h-5 px-2 font-mono uppercase tracking-wider border-0 bg-opacity-20 backdrop-blur-md ${riskColors[skill.risk] || riskColors.unknown}`}>
-                                    {skill.risk}
-                                  </Badge>
-                                </div>
-                                {skill.source !== "unknown" && (
-                                  <span className="text-[9px] text-muted-foreground/30 font-mono uppercase tracking-widest group-hover:text-primary/40 transition-colors">
-                                    {skill.source}
-                                  </span>
-                                )}
-                              </div>
-
-                              <div className="space-y-1">
-                                <h3 className="font-bold text-slate-100 group-hover:text-primary transition-colors text-base line-clamp-1 tracking-tight">
-                                  {skill.name}
-                                </h3>
-                                <p className="text-muted-foreground/70 text-xs line-clamp-2 leading-relaxed font-medium">
-                                  {skill.description}
-                                </p>
-                              </div>
-                            </div>
-
-                            {/* Footer / Path */}
-                            <div className="mt-4 pt-3 border-t border-white/5 relative z-10">
-                              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/50 font-mono overflow-hidden">
-                                <span className="shrink-0">./</span>
-                                <span className="truncate group-hover:text-primary/60 transition-colors">{skill.path.split('/').pop()}</span>
-                              </div>
-                            </div>
+                    {/* Top Section */}
+                    <div className="relative z-10">
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-lg shadow-inner ring-1 ring-white/10 group-hover:ring-primary/30 transition-all">
+                            {categoryIcons[skill.inferredCategory] || "📦"}
                           </div>
-                        );
-                      })}
+                          <Badge variant="outline" className={`text-[9px] h-5 px-2 font-mono uppercase tracking-wider border-0 bg-opacity-20 backdrop-blur-md ${riskColors[skill.risk] || riskColors.unknown}`}>
+                            {skill.risk}
+                          </Badge>
+                        </div>
+                        {skill.source !== "unknown" && (
+                          <span className="text-[9px] text-muted-foreground/30 font-mono uppercase tracking-widest group-hover:text-primary/40 transition-colors">
+                            {skill.source}
+                          </span>
+                        )}
+                      </div>
+
+                      <h3 className="font-bold text-slate-100 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-primary/80 transition-all text-base line-clamp-1 tracking-tight mb-2">
+                        {skill.name}
+                      </h3>
+                      <p className="text-muted-foreground/70 text-xs line-clamp-3 leading-relaxed font-medium">
+                        {skill.description}
+                      </p>
                     </div>
-                  );
-                })}
-              </div>
+
+                    {/* Bottom Section */}
+                    <div className="pt-3 border-t border-white/5 relative z-10 flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/50 font-mono overflow-hidden">
+                        <span className="shrink-0 text-primary/40">./</span>
+                        <span className="truncate group-hover:text-primary/70 transition-colors">{skill.path.split('/').pop()}</span>
+                      </div>
+                      <div className="w-6 h-6 rounded-full border border-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                        <span className="text-[10px] text-primary">↗</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
+
+            {/* Load More Button */}
+            {visibleCount < filteredSkills.length && (
+              <div className="flex justify-center py-8">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setVisibleCount(prev => prev + 24)}
+                  className="rounded-full px-8 border-white/10 hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-all shadow-lg shadow-black/20 font-medium"
+                >
+                  Load More Skills ({filteredSkills.length - visibleCount} remaining)
+                </Button>
+              </div>
+            )}
           </main>
         </div>
       </div>
