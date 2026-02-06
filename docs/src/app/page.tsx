@@ -20,19 +20,16 @@ const rawSkills = skillsData as SkillsData;
 
 // Category inference rules based on skill name/description keywords
 const categoryRules: { category: string; keywords: string[] }[] = [
-  { category: "ai-ml", keywords: ["ai", "llm", "gpt", "agent", "machine learning", "neural", "embedding", "rag", "prompt", "langchain", "openai", "anthropic", "claude", "model", "inference"] },
-  { category: "security", keywords: ["security", "penetration", "exploit", "vulnerability", "attack", "pentest", "auth", "authentication", "encryption", "csrf", "xss", "sql injection", "burp", "owasp", "breach", "credential"] },
-  { category: "frontend", keywords: ["react", "vue", "angular", "svelte", "next.js", "nextjs", "css", "tailwind", "ui", "ux", "component", "frontend", "html", "dom", "browser", "responsive", "animation"] },
-  { category: "backend", keywords: ["api", "rest", "graphql", "grpc", "server", "backend", "express", "fastapi", "django", "flask", "node.js", "database", "sql", "postgres", "mysql", "redis", "queue"] },
-  { category: "devops", keywords: ["docker", "kubernetes", "k8s", "ci/cd", "pipeline", "deploy", "aws", "azure", "gcp", "cloud", "terraform", "ansible", "jenkins", "github actions", "infrastructure"] },
-  { category: "testing", keywords: ["test", "testing", "jest", "playwright", "cypress", "unit test", "e2e", "integration test", "qa", "quality", "bats", "mock"] },
-  { category: "data", keywords: ["data", "analytics", "etl", "pipeline", "warehouse", "bigquery", "snowflake", "dbt", "airflow", "pandas", "spark", "visualization"] },
-  { category: "mobile", keywords: ["ios", "android", "react native", "flutter", "mobile", "swift", "kotlin", "app store"] },
-  { category: "blockchain", keywords: ["blockchain", "web3", "solidity", "ethereum", "smart contract", "defi", "nft", "crypto"] },
-  { category: "architecture", keywords: ["architecture", "design pattern", "microservice", "monolith", "ddd", "clean architecture", "hexagonal", "event-driven", "cqrs"] },
-  { category: "documentation", keywords: ["documentation", "readme", "api doc", "swagger", "openapi", "technical writing", "spec"] },
-  { category: "productivity", keywords: ["workflow", "automation", "productivity", "git", "bash", "shell", "cli", "scripting", "vim", "tmux"] },
-  { category: "game-dev", keywords: ["game", "unity", "unreal", "godot", "2d", "3d", "sprite", "physics", "rendering"] },
+  { category: "agentic-ai", keywords: ["agent", "autonomous", "task", "planning", "memory", "tool use", "function calling", "react", "reAct", "reflection", "multi-agent", "swarm", "orchestration"] },
+  { category: "llm-core", keywords: ["llm", "gpt", "openai", "anthropic", "claude", "gemini", "llama", "mistral", "inference", "context", "token", "embedding", "transformer", "huggingface", "weights"] },
+  { category: "rag-knowledge", keywords: ["rag", "retrieval", "vector", "embedding", "chroma", "pinecone", "milvus", "qdrant", "weaviate", "search", "semantic", "knowledge base", "document", "pdf", "unstructured"] },
+  { category: "security", keywords: ["security", "penetration", "red team", "exploit", "vulnerability", "attack", "pentest", "auth", "authentication", "encryption", "csrf", "xss", "shield", "guardrail", "owasp"] },
+  { category: "frontend-ui", keywords: ["react", "vue", "angular", "svelte", "next.js", "tailwind", "css", "ui", "ux", "component", "design system", "animation", "framer", "three.js", "canvas", "responsive"] },
+  { category: "backend-infra", keywords: ["api", "server", "express", "fastapi", "django", "node", "database", "sql", "postgres", "redis", "docker", "kubernetes", "cloud", "aws", "deploy", "serverless"] },
+  { category: "automation", keywords: ["workflow", "automation", "script", "bot", "scraper", "crawler", "browser", "playwright", "puppeteer", "selenium", "cron", "pipeline", "etl"] },
+  { category: "blockchain", keywords: ["blockchain", "web3", "solidity", "ethereum", "smart contract", "crypto", "nft", "token", "defi", "wallet", "dapp"] },
+  { category: "data-science", keywords: ["data", "analytics", "visualization", "pandas", "numpy", "matplotlib", "jupyter", "python", "statistics", "analysis", "mining", "scrape"] },
+  { category: "dev-tools", keywords: ["git", "testing", "debug", "monitor", "log", "lint", "format", "cli", "terminal", "bash", "shell", "ide", "vscode"] },
 ];
 
 // Infer category from skill name and description
@@ -50,8 +47,9 @@ function inferCategory(skill: Skill): string {
   // Check path for hints
   if (skill.path.includes("game-development")) return "game-dev";
   if (skill.path.includes("security")) return "security";
+  if (skill.path.includes("agent")) return "agentic-ai";
 
-  return skill.category; // fallback to original
+  return skill.category === "uncategorized" || !skill.category ? "dev-tools" : skill.category;
 }
 
 // Process skills with inferred categories
@@ -69,22 +67,17 @@ const riskColors: Record<string, string> = {
 };
 
 const categoryIcons: Record<string, string> = {
-  "ai-ml": "🧠",
-  security: "🔐",
-  frontend: "🎨",
-  backend: "⚙️",
-  devops: "🚀",
-  testing: "🧪",
-  data: "📊",
-  mobile: "📱",
-  blockchain: "⛓️",
-  architecture: "🏗️",
-  documentation: "📝",
-  productivity: "⚡",
-  "game-dev": "🎮",
-  "game-development": "🎮",
-  uncategorized: "📁",
-  "app-builder": "🔧",
+  "agentic-ai": "🤖",
+  "llm-core": "🧠",
+  "rag-knowledge": "📚",
+  "security": "�️",
+  "frontend-ui": "🎨",
+  "backend-infra": "⚙️",
+  "automation": "⚡",
+  "blockchain": "🔗",
+  "data-science": "📊",
+  "dev-tools": "🛠️",
+  "uncategorized": "�",
 };
 
 export default function Home() {
@@ -373,40 +366,45 @@ export default function Home() {
                           <div
                             key={skill.id}
                             onClick={() => setSelectedSkill(skill)}
-                            className={`group relative p-4 rounded-xl border bg-card/50 backdrop-blur-sm transition-all duration-300 hover:bg-card/80 hover:-translate-y-1 cursor-pointer overflow-hidden ${isFocused
-                              ? "ring-2 ring-primary border-primary/50 shadow-[0_0_20px_rgba(139,92,246,0.15)]"
-                              : "border-white/5 hover:border-primary/30 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.5)]"
+                            className={`group relative p-5 h-full rounded-2xl border bg-card/40 backdrop-blur-xl transition-all duration-300 hover:bg-card/60 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 cursor-pointer overflow-hidden flex flex-col justify-between ${isFocused
+                              ? "ring-2 ring-primary/70 border-primary/50 shadow-[0_0_20px_rgba(139,92,246,0.15)]"
+                              : "border-white/5 hover:border-primary/20"
                               }`}
                           >
-                            {/* Spotlight Gradient */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            {/* Animated Background Mesh */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-                            <div className="relative z-10 flex flex-col h-full justify-between">
-                              <div>
-                                <div className="flex items-center justify-between gap-2 mb-3">
-                                  <Badge variant="outline" className={`shrink-0 text-[10px] h-5 px-1.5 border-0 bg-opacity-20 ${riskColors[skill.risk] || riskColors.unknown}`}>
+                            {/* Content */}
+                            <div className="relative z-10 flex flex-col gap-3">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xl filter drop-shadow-lg">{categoryIcons[skill.inferredCategory] || "📦"}</span>
+                                  <Badge variant="outline" className={`text-[9px] h-5 px-2 font-mono uppercase tracking-wider border-0 bg-opacity-20 backdrop-blur-md ${riskColors[skill.risk] || riskColors.unknown}`}>
                                     {skill.risk}
                                   </Badge>
-                                  {skill.source !== "unknown" && (
-                                    <span className="text-[9px] text-muted-foreground/40 font-mono uppercase tracking-widest">
-                                      {skill.source}
-                                    </span>
-                                  )}
                                 </div>
-                                <h3 className="font-semibold text-slate-100 group-hover:text-primary transition-colors text-sm mb-1.5 line-clamp-1">
-                                  {skill.name}
-                                </h3>
+                                {skill.source !== "unknown" && (
+                                  <span className="text-[9px] text-muted-foreground/30 font-mono uppercase tracking-widest group-hover:text-primary/40 transition-colors">
+                                    {skill.source}
+                                  </span>
+                                )}
                               </div>
 
-                              <p className="text-muted-foreground/60 text-[11px] line-clamp-2 leading-relaxed mb-auto">
-                                {skill.description}
-                              </p>
+                              <div className="space-y-1">
+                                <h3 className="font-bold text-slate-100 group-hover:text-primary transition-colors text-base line-clamp-1 tracking-tight">
+                                  {skill.name}
+                                </h3>
+                                <p className="text-muted-foreground/70 text-xs line-clamp-2 leading-relaxed font-medium">
+                                  {skill.description}
+                                </p>
+                              </div>
+                            </div>
 
-                              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/5">
-                                <div className="flex items-center gap-1.5 text-xs text-muted-foreground group-hover:text-primary/80 transition-colors">
-                                  <span>{categoryIcons[skill.inferredCategory] || "📁"}</span>
-                                  <span className="opacity-70 group-hover:opacity-100">{skill.inferredCategory}</span>
-                                </div>
+                            {/* Footer / Path */}
+                            <div className="mt-4 pt-3 border-t border-white/5 relative z-10">
+                              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/50 font-mono overflow-hidden">
+                                <span className="shrink-0">./</span>
+                                <span className="truncate group-hover:text-primary/60 transition-colors">{skill.path.split('/').pop()}</span>
                               </div>
                             </div>
                           </div>
