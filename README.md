@@ -73,18 +73,17 @@ Works with **any MCP client**:
 - Claude Desktop & Code
 - Cursor
 - VS Code Copilot
-- OpenCode
 - Custom integrations
 
 </td>
 <td width="50%">
 
-### 🐳 Cloud-Ready
-Deploy anywhere in seconds:
-```bash
-docker run -p 3000:3000 \
-  abderraoufyt/skills-mcp-server
-```
+### � Premium UI Experience
+Immersive, modern interface:
+- **Interactive 3D Orb** background (OGL)
+- **Glassmorphism** design system
+- **Stable Grid Layout** with load-more
+- **Mobile-first** responsive design
 
 </td>
 </tr>
@@ -93,20 +92,20 @@ docker run -p 3000:3000 \
 
 ### 📚 634+ Skills
 Curated, production-tested guidance:
-- Security best practices
-- Modern framework patterns
-- Infrastructure automation
-- AI/ML workflows
+- **Agentic Systems** & Orchestration
+- **Generative AI** Engineering
+- **Platform Engineering** practices
+- **Web3 & Security** protocols
 
 </td>
 <td width="50%">
 
 ### 🔧 6 Tools + 2 Prompts
 Everything you need:
-- Browse & search skills
-- **Auto-detect relevant skills**
-- **Generate complex workflows**
-- Read full documentation
+- **Semantic Skill Matcher**
+- **Workflow Generator**
+- **Deep Skill Documentation**
+- **Smart Categorization**
 
 </td>
 </tr>
@@ -114,88 +113,20 @@ Everything you need:
 
 ---
 
-## 🛠️ Tools
-
-| Tool | Description | Example Prompt |
-|------|-------------|----------------|
-| `list_skills` | Browse by category | *"List all security skills"* |
-| `search_skills` | Find by keyword | *"Search for react testing"* |
-| `get_skill` | Get full details | *"Get the typescript-expert skill"* |
-| `get_categories` | View all categories | *"Show skill categories"* |
-| `suggest_workflow` | Step-by-step guidance | *"Workflow for building an API"* |
-| `get_skill_content` | Read SKILL.md | *"Read react-patterns skill"* |
-
----
-
-## 🤖 Prompts (Auto-Detection)
-
-| Prompt | Description | Use Case |
-|--------|-------------|----------|
-| `auto_skill` | **Semantic Skill Matcher**<br>Analyzes your task and auto-loads relevant expert skills. | *Start of any new task* |
-| `skill_workflow` | **Workflow Generator**<br>Creates a multi-step plan using best-practice skills. | *Complex implementation planning* |
-
----
-
-## 🚀 Deployment
-
-### Local (stdio)
-
-```bash
-npm run build
-npm run start
-```
-
-### Docker
-
-```bash
-# Quick run
-docker run -p 3000:3000 abderraoufyt/skills-mcp-server
-
-# Or with compose
-docker-compose up -d
-```
-
-### Manual Config
-
-Add to your MCP configuration:
-
-```json
-{
-  "mcpServers": {
-    "antigravity-skills": {
-      "command": "node",
-      "args": ["/path/to/skills-mcp-server/dist/index.js"]
-    }
-  }
-}
-```
-
-<details>
-<summary><strong>📁 Config file locations</strong></summary>
-
-| Client | Path |
-|--------|------|
-| Gemini CLI | `~/.gemini/settings.json` |
-| Claude | `~/.config/claude/mcp_config.json` |
-| Cursor | `~/.cursor/mcp.json` |
-| VS Code | `~/.vscode/mcp.json` |
-
-</details>
-
----
-
-## 📊 Skill Categories
+## � Modern Skill Taxonomy (2026 Standard)
 
 | Category | Skills | Highlights |
 |----------|--------|------------|
-| 🔐 **Security** | 107 | Pentesting, OWASP, vulnerability scanning |
-| 📝 **General** | 95 | Documentation, planning, brainstorming |
-| 🧠 **Data & AI** | 81 | LangChain, RAG, prompt engineering |
-| 💻 **Development** | 72 | TypeScript, Python, React, Node.js |
-| ☁️ **Infrastructure** | 72 | Docker, K8s, AWS, Terraform |
-| 🏗️ **Architecture** | 52 | System design, microservices |
-| 📈 **Business** | 35 | Pricing, copywriting, SEO |
-| 🧪 **Testing** | 21 | TDD, Playwright, Jest |
+| 🤖 **Agentic Systems** | 98 | Autonomous Agents, Swarms, Memory, Tool Use |
+| 🧠 **Generative AI** | 85 | LLMs, Inference, Transformers, Prompt Eng |
+| ☁️ **Platform Eng** | 72 | Cloud, Kubernetes, Terraform, Microservices |
+| 🎨 **Product Exp** | 95 | Next.js, React, Mobile, Accessibility, UI/UX |
+| �️ **Security** | 107 | DevSecOps, Red Teaming, Auth, Encryption |
+| 🎮 **Game & 3D** | 45 | Unity, Three.js, OGL, WebGL, Shaders |
+| � **Knowledge** | 60 | RAG, Vector DBs, Semantic Search |
+| ⚡ **Automation** | 40 | Playwright, Crawlers, ETL Pipelines |
+| � **Web3 Core** | 35 | Smart Contracts, DeFi, Solidity |
+
 
 ---
 

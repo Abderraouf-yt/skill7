@@ -1,6 +1,6 @@
 {
   "name": "@antigravity/skills-mcp-server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Universal MCP server for 634+ AI skills - Gemini CLI, Claude, Cursor, Copilot & more",
   "type": "module",
   "main": "dist/index.js",

@@ -17,23 +17,24 @@ import Image from "next/image";
 
 const rawSkills = skillsData as SkillsData;
 
-// Category inference rules based on skill name/description keywords
+// Category inference rules based on skill name/description keywords - 2026 Modern Standard
 const categoryRules: { category: string; keywords: string[] }[] = [
-  { category: "agentic-ai", keywords: ["agent", "autonomous", "task", "planning", "memory", "tool use", "function calling", "react", "reAct", "reflection", "multi-agent", "swarm", "orchestration"] },
-  { category: "llm-core", keywords: ["llm", "gpt", "openai", "anthropic", "claude", "gemini", "llama", "mistral", "inference", "context", "token", "embedding", "transformer", "huggingface", "weights"] },
-  { category: "rag-knowledge", keywords: ["rag", "retrieval", "vector", "embedding", "chroma", "pinecone", "milvus", "qdrant", "weaviate", "search", "semantic", "knowledge base", "document", "pdf", "unstructured"] },
-  { category: "security", keywords: ["security", "penetration", "red team", "exploit", "vulnerability", "attack", "pentest", "auth", "authentication", "encryption", "csrf", "xss", "shield", "guardrail", "owasp"] },
-  { category: "frontend-ui", keywords: ["react", "vue", "angular", "svelte", "next.js", "tailwind", "css", "ui", "ux", "component", "design system", "animation", "framer", "three.js", "canvas", "responsive"] },
-  { category: "backend-infra", keywords: ["api", "server", "express", "fastapi", "django", "node", "database", "sql", "postgres", "redis", "docker", "kubernetes", "cloud", "aws", "deploy", "serverless"] },
-  { category: "automation", keywords: ["workflow", "automation", "script", "bot", "scraper", "crawler", "browser", "playwright", "puppeteer", "selenium", "cron", "pipeline", "etl"] },
-  { category: "blockchain", keywords: ["blockchain", "web3", "solidity", "ethereum", "smart contract", "crypto", "nft", "token", "defi", "wallet", "dapp"] },
-  { category: "data-science", keywords: ["data", "analytics", "visualization", "pandas", "numpy", "matplotlib", "jupyter", "python", "statistics", "analysis", "mining", "scrape"] },
-  { category: "dev-tools", keywords: ["git", "testing", "debug", "monitor", "log", "lint", "format", "cli", "terminal", "bash", "shell", "ide", "vscode"] },
+  { category: "agentic-systems", keywords: ["agent", "autonomous", "task", "planning", "memory", "tool use", "function calling", "react", "reAct", "reflection", "multi-agent", "swarm", "orchestration", "autogen", "langchain", "crewai"] },
+  { category: "generative-ai", keywords: ["llm", "gpt", "openai", "anthropic", "claude", "gemini", "llama", "mistral", "inference", "context", "token", "embedding", "transformer", "huggingface", "weights", "diffusion", "image gen"] },
+  { category: "knowledge-engineering", keywords: ["rag", "retrieval", "vector", "embedding", "chroma", "pinecone", "milvus", "qdrant", "weaviate", "search", "semantic", "knowledge base", "document", "pdf", "unstructured"] },
+  { category: "security-engineering", keywords: ["security", "penetration", "red team", "exploit", "vulnerability", "attack", "pentest", "auth", "authentication", "encryption", "csrf", "xss", "shield", "guardrail", "owasp", "devsecops"] },
+  { category: "product-experience", keywords: ["frontend", "ui", "ux", "react", "vue", "angular", "svelte", "next", "tailwind", "css", "component", "design system", "animation", "framer", "responsive", "mobile", "app", "accessibility", "wcag"] },
+  { category: "interactive-media", keywords: ["game", "3d", "canvas", "three.js", "webgl", "ogl", "shader", "unity", "unreal", "godot", "rendering", "audio", "video"] },
+  { category: "platform-engineering", keywords: ["backend", "api", "server", "express", "fastapi", "django", "node", "database", "sql", "postgres", "redis", "docker", "kubernetes", "cloud", "aws", "deploy", "serverless", "infrastructure", "microservices"] },
+  { category: "automation-ops", keywords: ["workflow", "automation", "script", "bot", "scraper", "crawler", "browser", "playwright", "puppeteer", "selenium", "cron", "pipeline", "etl", "rpa"] },
+  { category: "web3-core", keywords: ["blockchain", "web3", "solidity", "ethereum", "smart contract", "crypto", "nft", "token", "defi", "wallet", "dapp"] },
+  { category: "data-intelligence", keywords: ["data", "analytics", "visualization", "pandas", "numpy", "matplotlib", "jupyter", "python", "statistics", "analysis", "mining", "scrape", "etl"] },
+  { category: "dev-excellence", keywords: ["git", "testing", "debug", "monitor", "log", "lint", "format", "cli", "terminal", "bash", "shell", "ide", "vscode", "productivity"] },
 ];
 
 // Infer category from skill name and description
 function inferCategory(skill: Skill): string {
-  const text = `${skill.name} ${skill.description} ${skill.path}`.toLowerCase();
+  const text = `${skill.name} ${skill.description} ${skill.path} ${skill.category || ''}`.toLowerCase();
 
   for (const rule of categoryRules) {
     for (const keyword of rule.keywords) {
@@ -43,19 +44,79 @@ function inferCategory(skill: Skill): string {
     }
   }
 
-  // Check path for hints
-  if (skill.path.includes("game-development")) return "game-dev";
-  if (skill.path.includes("security")) return "security";
-  if (skill.path.includes("agent")) return "agentic-ai";
+  // Fallback Mapping for Legacy Paths
+  if (skill.path.includes("game-development")) return "interactive-media";
+  if (skill.path.includes("security")) return "security-engineering";
+  if (skill.path.includes("agent")) return "agentic-systems";
 
-  return skill.category === "uncategorized" || !skill.category ? "dev-tools" : skill.category;
+  return "dev-excellence";
+}
+
+// Category Normalization & Display Labels
+const categoryNormalization: Record<string, string> = {
+  // Legacy -> Modern Mapping
+  "game-development": "interactive-media",
+  "game-dev": "interactive-media",
+  "game-developements": "interactive-media",
+  "frontend-ui": "product-experience",
+  "backend-infra": "platform-engineering",
+  "agentic-ai": "agentic-systems",
+  "llm-core": "generative-ai",
+  "rag-knowledge": "knowledge-engineering",
+  "security": "security-engineering",
+  "automation": "automation-ops",
+  "blockchain": "web3-core",
+  "data-science": "data-intelligence",
+  "dev-tools": "dev-excellence",
+  "uncategorized": "dev-excellence"
+};
+
+const categoryLabels: Record<string, string> = {
+  "agentic-systems": "Agentic Systems",
+  "generative-ai": "Generative AI",
+  "knowledge-engineering": "Knowledge & RAG",
+  "platform-engineering": "Platform Eng",
+  "product-experience": "Product Experience",
+  "interactive-media": "Game & 3D Media",
+  "security-engineering": "Security",
+  "automation-ops": "Automation Ops",
+  "web3-core": "Web3 Core",
+  "data-intelligence": "Data Intelligence",
+  "dev-excellence": "Dev Excellence",
+};
+
+function normalizeCategory(cat: string): string {
+  if (!cat) return "dev-excellence";
+  const lower = cat.toLowerCase().trim();
+  // Check direct updated keys first, then normalization map
+  const normalized = categoryNormalization[lower] || lower;
+
+  // Ensure we only return valid modern keys if possible, usually the map handles it.
+  // If the normalized key isn't in our icons map (checked later), it defaults.
+  return normalized;
 }
 
 // Process skills with inferred categories
-const skills = rawSkills.map(skill => ({
-  ...skill,
-  inferredCategory: skill.category === "uncategorized" ? inferCategory(skill) : skill.category
-}));
+const skills = rawSkills.map(skill => {
+  let cat = skill.category;
+
+  // Re-infer if uncategorized OR if we want to force modern categorization on old data
+  // Strategies: 1. Trust 'category' if valid modern key. 2. Normalize if legacy. 3. Infer if 'uncategorized'.
+
+  const normalizedInput = categoryNormalization[cat?.toLowerCase() || ""] || cat;
+  const isModern = categoryLabels[normalizedInput];
+
+  if (!isModern || cat === "uncategorized" || !cat) {
+    cat = inferCategory(skill);
+  } else {
+    cat = normalizedInput;
+  }
+
+  return {
+    ...skill,
+    inferredCategory: cat
+  };
+});
 
 const riskColors: Record<string, string> = {
   low: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
@@ -66,18 +127,21 @@ const riskColors: Record<string, string> = {
 };
 
 const categoryIcons: Record<string, string> = {
-  "agentic-ai": "🤖",
-  "llm-core": "🧠",
-  "rag-knowledge": "📚",
-  "security": "🛡️",
-  "frontend-ui": "🎨",
-  "backend-infra": "⚙️",
-  "automation": "⚡",
-  "blockchain": "🔗",
-  "data-science": "📊",
-  "dev-tools": "🛠️",
+  "agentic-systems": "🤖",
+  "generative-ai": "🧠",
+  "knowledge-engineering": "📚",
+  "security-engineering": "🛡️",
+  "product-experience": "🎨",
+  "interactive-media": "🎮",
+  "platform-engineering": "☁️",
+  "automation-ops": "⚡",
+  "web3-core": "🔗",
+  "data-intelligence": "📊",
+  "dev-excellence": "🛠️",
   "uncategorized": "📦",
 };
+
+import Orb from "@/components/visuals/Orb";
 
 export default function Home() {
   const [search, setSearch] = useState("");
@@ -159,10 +223,18 @@ export default function Home() {
   }, [handleKeyDown]);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col font-sans selection:bg-primary/20">
-      {/* Background Grids */}
-      <div className="fixed inset-0 bg-grid-white/[0.02] pointer-events-none" />
-      <div className="fixed inset-0 bg-gradient-to-tr from-background via-background to-primary/5 pointer-events-none" />
+    <div className="min-h-screen bg-background flex flex-col font-sans selection:bg-primary/20 relative overflow-hidden">
+      {/* Background Grids & Orbs */}
+      <div className="fixed inset-0 bg-grid-white/[0.02] pointer-events-none z-0" />
+      <div className="fixed inset-0 bg-gradient-to-tr from-background via-background to-primary/5 pointer-events-none z-0" />
+
+      {/* Animated Orb Background */}
+      <div className="fixed top-[-20%] right-[-10%] w-[800px] h-[800px] opacity-20 pointer-events-none z-0">
+        <Orb hoverIntensity={0.5} rotateOnHover={true} hue={0} forceHoverState={true} />
+      </div>
+      <div className="fixed bottom-[-20%] left-[-10%] w-[600px] h-[600px] opacity-10 pointer-events-none z-0">
+        <Orb hoverIntensity={0.3} rotateOnHover={true} hue={180} forceHoverState={true} />
+      </div>
 
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-background/70 border-b border-border/40 supports-[backdrop-filter]:bg-background/60">
@@ -258,7 +330,7 @@ export default function Home() {
                     >
                       <span className="flex items-center gap-2">
                         <span className="opacity-70 group-hover:opacity-100 transition-opacity">{categoryIcons[cat] || "📁"}</span>
-                        {cat}
+                        {categoryLabels[cat] || cat}
                       </span>
                       <span className="text-[10px] bg-secondary/50 px-1.5 py-0.5 rounded opacity-60 group-hover:opacity-100 transition-opacity">{count}</span>
                     </button>
@@ -274,7 +346,7 @@ export default function Home() {
               <h2 className="text-xl font-semibold text-foreground tracking-tight">
                 {selectedCategory ? (
                   <span className="flex items-center gap-2">
-                    {categoryIcons[selectedCategory]} {selectedCategory}
+                    {categoryIcons[selectedCategory]} {categoryLabels[selectedCategory] || selectedCategory}
                     <Badge variant="secondary" className="ml-2 text-xs bg-primary/10 text-primary border-transparent h-5">{filteredSkills.length}</Badge>
                   </span>
                 ) : (
