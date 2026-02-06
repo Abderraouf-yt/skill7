@@ -10,8 +10,8 @@ export interface Skill {
     instruction?: string;
 }
 
-export interface ScoredSkill {
-    skill: Skill;
+export interface ScoredSkill<T extends Skill = Skill> {
+    skill: T;
     score: number;
 }
 
@@ -20,7 +20,7 @@ export interface ScoredSkill {
  * Matches skills by meaning, not just keywords.
  * Identical logic to MCP server for consistent results.
  */
-export function semanticSearch(query: string, skills: Skill[], topK: number = 3): ScoredSkill[] {
+export function semanticSearch<T extends Skill>(query: string, skills: T[], topK: number = 3): { skill: T; score: number }[] {
     if (!query) return [];
 
     // Split by whitespace to preserve special chars like hyphens in "thought-graph"
