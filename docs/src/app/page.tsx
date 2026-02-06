@@ -3,6 +3,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import skillsData from "@/data/skills.json";
+import { semanticSearch } from "@/lib/semanticSearch";
 import GradientText from "@/components/visuals/GradientText";
 import Antigravity from "@/components/visuals/Antigravity";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -104,15 +105,23 @@ export default function Home() {
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, []);
 
+  const BASE_PATH = "/skills-mcp-server";
+
   const filteredSkills = useMemo(() => {
-    return skills.filter((skill) => {
-      const matchesSearch =
-        !search ||
-        skill.name.toLowerCase().includes(search.toLowerCase()) ||
-        skill.description.toLowerCase().includes(search.toLowerCase());
-      const matchesCategory = !selectedCategory || skill.inferredCategory === selectedCategory;
-      return matchesSearch && matchesCategory;
-    });
+    let result = skills;
+
+    // Apply strict semantic search if query exists
+    if (search.trim()) {
+      const scored = semanticSearch(search, skills, 1000); // Get all matches, ranked
+      result = scored.map(s => s.skill);
+    }
+
+    // Apply category filter
+    if (selectedCategory) {
+      result = result.filter(skill => skill.inferredCategory === selectedCategory);
+    }
+
+    return result;
   }, [search, selectedCategory]);
 
   // Virtualized list - 3 columns, 180px row height
@@ -206,7 +215,7 @@ export default function Home() {
             <div className="flex items-center gap-3 group cursor-default">
               <Antigravity range={6} duration={4}>
                 <div className="relative w-10 h-10 transition-transform group-hover:scale-110 duration-500">
-                  <Image src="/logo.svg" alt="Logo" width={40} height={40} className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(139,92,246,0.5)]" />
+                  <Image src={`${BASE_PATH}/logo.svg`} alt="Logo" width={40} height={40} className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(139,92,246,0.5)]" />
                 </div>
               </Antigravity>
               <div className="flex flex-col">
@@ -416,7 +425,7 @@ export default function Home() {
       <footer className="border-t border-white/5 bg-background/50 py-8 mt-auto z-10">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-4 opacity-50">
-            <Image src="/logo.svg" alt="AntiGravity" width={24} height={24} className="grayscale" />
+            <Image src={`${BASE_PATH}/logo.svg`} alt="AntiGravity" width={24} height={24} className="grayscale" />
           </div>
           <p className="text-muted-foreground text-sm">
             Made with <span className="text-rose-500 animate-pulse">❤️</span> by{" "}
@@ -497,4 +506,3 @@ export default function Home() {
     </div>
   );
 }
-
