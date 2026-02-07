@@ -333,7 +333,7 @@ function createMcpServer(): McpServer {
             return {
                 content: [{
                     type: 'text',
-                    text: `Skill info:\n${JSON.stringify(skill, null, 2)}\n\nClone repo for full content: git clone https://github.com/Abderraouf-yt/skills-mcp-server.git`
+                    text: `Skill info:\n${JSON.stringify(skill, null, 2)}\n\nClone repo for full content: git clone https://github.com/Abderraouf-yt/skill7.git`
                 }]
             };
         }

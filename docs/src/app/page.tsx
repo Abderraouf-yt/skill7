@@ -242,7 +242,7 @@ export default function Home() {
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, []);
 
-  const BASE_PATH = "/skills-mcp-server";
+  const BASE_PATH = "/skill7";
 
   const filteredSkills = useMemo(() => {
     let result = skills;
@@ -368,7 +368,7 @@ export default function Home() {
                 variant="outline"
                 size="sm"
                 className="border-primary/20 text-primary hover:bg-primary/10 h-9 gap-2"
-                onClick={() => window.open("https://github.com/Abderraouf-yt/skills-mcp-server", "_blank")}
+                onClick={() => window.open("https://github.com/Abderraouf-yt/skill7", "_blank")}
               >
                 <span>⭐</span> Star on GitHub
               </Button>

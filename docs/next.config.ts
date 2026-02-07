@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "export",
-  basePath: "/skills-mcp-server",
+  basePath: "/skill7",
   images: {
     unoptimized: true,
   },

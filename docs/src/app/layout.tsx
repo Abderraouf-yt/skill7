@@ -9,14 +9,14 @@ export const metadata: Metadata = {
   description: "Browse and search 634+ production-ready AI development skills for security, development, infrastructure, and more. Works with Gemini CLI, Claude, Cursor & VS Code.",
   keywords: ["skill7", "MCP", "AI skills", "development", "security", "infrastructure", "Gemini CLI", "Claude", "Cursor"],
   icons: {
-    icon: "/skills-mcp-server/favicon.svg",
+    icon: "/skill7/favicon.svg",
   },
   openGraph: {
     title: "Skill7 - Expert Skills for AI Agents",
     description: "634+ AI development skills for any MCP-compatible client",
     type: "website",
-    url: "https://abderraouf-yt.github.io/skills-mcp-server",
-    images: ["/skills-mcp-server/favicon.svg"],
+    url: "https://abderraouf-yt.github.io/skill7",
+    images: ["/skill7/favicon.svg"],
   },
 };
 

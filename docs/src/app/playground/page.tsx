@@ -16,7 +16,7 @@ function DeployButton({ label, icon: Icon, className }: { label: string, icon: a
     return (
         <Button
             className={`bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] transition-all transform hover:-translate-y-0.5 ${className}`}
-            onClick={() => window.open('https://github.com/Abderraouf-yt/skills-mcp-server', '_blank')}
+            onClick={() => window.open('https://github.com/Abderraouf-yt/skill7', '_blank')}
         >
             <Icon className="w-4 h-4 mr-2" />
             {label}
@@ -86,7 +86,7 @@ export default function PlaygroundPage() {
                     <Card className="flex-1 bg-zinc-900/50 border-white/10 backdrop-blur-xl flex flex-col overflow-hidden relative group">
                         {/* INPUT PANEL CTA */}
                         <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button size="sm" variant="secondary" className="bg-white/10 hover:bg-white/20 text-xs" onClick={() => window.open('https://github.com/Abderraouf-yt/skills-mcp-server', '_blank')}>
+                            <Button size="sm" variant="secondary" className="bg-white/10 hover:bg-white/20 text-xs" onClick={() => window.open('https://github.com/Abderraouf-yt/skill7', '_blank')}>
                                 <Code className="w-3 h-3 mr-1" /> Use in IDE
                             </Button>
                         </div>

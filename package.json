@@ -34,9 +34,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Abderraouf-yt/skills-mcp-server.git"
+    "url": "https://github.com/Abderraouf-yt/skill7.git"
   },
-  "homepage": "https://github.com/Abderraouf-yt/skills-mcp-server#readme",
+  "homepage": "https://github.com/Abderraouf-yt/skill7#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
     "zod": "^3.24.0"

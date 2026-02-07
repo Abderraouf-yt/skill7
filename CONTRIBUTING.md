@@ -8,7 +8,7 @@
 
 ## Adding Skills
 
-Skills come from the [skill7 database](https://github.com/Abderraouf-yt/skills-mcp-server).
+Skills come from the [skill7 database](https://github.com/Abderraouf-yt/skill7).
 
 To add new skills:
 1. Add SKILL.md to `data/skills/your-skill/`

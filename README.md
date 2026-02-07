@@ -11,10 +11,10 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/skill7"><img src="https://img.shields.io/npm/v/skill7?style=for-the-badge&logo=npm&color=cb3837" alt="npm"></a>
-  <a href="https://abderraouf-yt.github.io/skills-mcp-server"><img src="https://img.shields.io/badge/🔗_Live_Demo-View_Skills-violet?style=for-the-badge" alt="Demo"></a>
-  <a href="https://github.com/Abderraouf-yt/skills-mcp-server/releases"><img src="https://img.shields.io/github/v/release/Abderraouf-yt/skills-mcp-server?style=for-the-badge&logo=github&logoColor=white&color=7c3aed" alt="Release"></a>
-  <a href="https://github.com/Abderraouf-yt/skills-mcp-server/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="License"></a>
-  <a href="https://github.com/Abderraouf-yt/skills-mcp-server/stargazers"><img src="https://img.shields.io/github/stars/Abderraouf-yt/skills-mcp-server?style=for-the-badge&logo=github&color=f59e0b" alt="Stars"></a>
+  <a href="https://abderraouf-yt.github.io/skill7"><img src="https://img.shields.io/badge/🔗_Live_Demo-View_Skills-violet?style=for-the-badge" alt="Demo"></a>
+  <a href="https://github.com/Abderraouf-yt/skill7/releases"><img src="https://img.shields.io/github/v/release/Abderraouf-yt/skill7?style=for-the-badge&logo=github&logoColor=white&color=7c3aed" alt="Release"></a>
+  <a href="https://github.com/Abderraouf-yt/skill7/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="License"></a>
+  <a href="https://github.com/Abderraouf-yt/skill7/stargazers"><img src="https://img.shields.io/github/stars/Abderraouf-yt/skill7?style=for-the-badge&logo=github&color=f59e0b" alt="Stars"></a>
 </p>
 
 <p align="center">
@@ -48,7 +48,7 @@ You spend hours searching for best practices, design patterns, and solutions. Th
 
 ```bash
 # Clone and install
-git clone https://github.com/Abderraouf-yt/skills-mcp-server.git && cd skills-mcp-server
+git clone https://github.com/Abderraouf-yt/skill7.git && cd skill7
 npm install && npm run build
 
 # Configure your AI client (pick one)
@@ -150,7 +150,7 @@ When running with `MCP_TRANSPORT=http`:
 ## 📦 Project Structure
 
 ```
-skills-mcp-server/
+skill7/
 ├── src/
 │   └── index.ts       # MCP server (dual transport)
 ├── data/
@@ -187,7 +187,7 @@ MIT © [Skill7](https://github.com/Abderraouf-yt)
 </p>
 
 <p align="center">
-  <a href="https://github.com/Abderraouf-yt/skills-mcp-server">⭐ Star this repo</a> •
-  <a href="https://github.com/Abderraouf-yt/skills-mcp-server/issues">Report Bug</a> •
-  <a href="https://github.com/Abderraouf-yt/skills-mcp-server/issues">Request Feature</a>
+  <a href="https://github.com/Abderraouf-yt/skill7">⭐ Star this repo</a> •
+  <a href="https://github.com/Abderraouf-yt/skill7/issues">Report Bug</a> •
+  <a href="https://github.com/Abderraouf-yt/skill7/issues">Request Feature</a>
 </p>
