@@ -40,6 +40,7 @@ interface Skill {
     description: string;
     risk: string;
     source: string;
+    trustScore?: number;
 }
 
 interface CategoryStats {
@@ -161,37 +162,60 @@ function getSkillContentSync(skill: Skill): string {
 
     return `# ${skill.name}\n\n${skill.description}\n\n**Category:** ${skill.category}\n**Risk:** ${skill.risk}`;
 }
+/**
+ * Smart workflow suggestion using semantic search
+ * Finds relevant skills based on goal and creates actionable workflow
+ */
+function suggestWorkflow(goal: string): { steps: Array<{ skill: string; action: string; reason: string; trustScore?: number }> } {
+    const relevantSkills = semanticSearch(goal, 5);
 
-function suggestWorkflow(goal: string): { steps: Array<{ skill: string; action: string; reason: string }> } {
-    const keywords = goal.toLowerCase();
-    const steps: Array<{ skill: string; action: string; reason: string }> = [];
+    const steps = relevantSkills.map((skill, index) => ({
+        skill: skill.id,
+        action: inferAction(skill, goal),
+        reason: `Relevant skill: ${skill.description.slice(0, 60)}...`,
+        trustScore: skill.trustScore
+    }));
 
-    if (keywords.includes('api') || keywords.includes('backend')) {
-        steps.push({ skill: 'api-design-principles', action: 'design', reason: 'Define API structure' });
-    }
-    if (keywords.includes('web') || keywords.includes('frontend')) {
-        steps.push({ skill: 'react-best-practices', action: 'design', reason: 'Plan UI components' });
-    }
-    if (keywords.includes('security')) {
-        steps.push({ skill: 'api-security-best-practices', action: 'audit', reason: 'Security review' });
-    }
-    if (keywords.includes('typescript')) {
-        steps.push({ skill: 'typescript-expert', action: 'implement', reason: 'TypeScript patterns' });
-    }
-    if (keywords.includes('python')) {
-        steps.push({ skill: 'python-pro', action: 'implement', reason: 'Python patterns' });
-    }
-    if (keywords.includes('react')) {
-        steps.push({ skill: 'react-patterns', action: 'implement', reason: 'React patterns' });
+    // Always add testing as final step if not already included
+    const hasTestingSkill = steps.some(s => s.skill.includes('test'));
+    if (!hasTestingSkill && steps.length > 0) {
+        steps.push({
+            skill: 'testing-patterns',
+            action: 'test',
+            reason: 'Validate implementation with tests',
+            trustScore: undefined
+        });
     }
 
-    steps.push({ skill: 'testing-patterns', action: 'test', reason: 'Testing' });
-
-    if (steps.length === 1) {
-        steps.unshift({ skill: 'brainstorming', action: 'plan', reason: 'Planning' });
+    // Fallback if no skills found
+    if (steps.length === 0) {
+        return {
+            steps: [
+                { skill: 'brainstorming', action: 'plan', reason: 'Start with planning phase' },
+                { skill: 'testing-patterns', action: 'test', reason: 'Validate implementation' }
+            ]
+        };
     }
 
     return { steps };
+}
+
+/**
+ * Infer action type from skill and goal context
+ */
+function inferAction(skill: Skill, goal: string): string {
+    const keywords = goal.toLowerCase();
+    const skillName = skill.name.toLowerCase();
+
+    if (keywords.includes('test') || skillName.includes('test')) return 'test';
+    if (keywords.includes('design') || skillName.includes('design')) return 'design';
+    if (keywords.includes('audit') || keywords.includes('security') || skillName.includes('security')) return 'audit';
+    if (keywords.includes('build') || keywords.includes('create') || keywords.includes('implement')) return 'implement';
+    if (keywords.includes('review') || skillName.includes('review')) return 'review';
+    if (keywords.includes('debug') || keywords.includes('fix')) return 'debug';
+    if (skillName.includes('pattern') || skillName.includes('best-practice')) return 'apply';
+
+    return 'implement';
 }
 
 // ============================================================================
@@ -201,7 +225,7 @@ function suggestWorkflow(goal: string): { steps: Array<{ skill: string; action: 
 function createMcpServer(): McpServer {
     const server = new McpServer({
         name: 'skill7',
-        version: '1.1.0',
+        version: '2.0.0',
     });
 
     // TOOL: list_skills
@@ -219,16 +243,23 @@ function createMcpServer(): McpServer {
                 : skills;
 
             const paginated = filtered.slice(offset, offset + limit);
+            const hasMore = offset + limit < filtered.length;
             return {
                 content: [{
                     type: 'text',
                     text: JSON.stringify({
                         total: filtered.length,
+                        count: paginated.length,
+                        offset,
+                        limit,
+                        has_more: hasMore,
+                        next_offset: hasMore ? offset + limit : null,
                         skills: paginated.map(s => ({
                             id: s.id,
                             name: s.name,
                             description: s.description.slice(0, 100),
                             category: s.category,
+                            trustScore: s.trustScore,
                         })),
                     }, null, 2)
                 }],
@@ -244,7 +275,13 @@ function createMcpServer(): McpServer {
         async ({ skillId }) => {
             const skill = skills.find(s => s.id === skillId || s.name === skillId);
             if (!skill) {
-                return { content: [{ type: 'text', text: `Skill "${skillId}" not found.` }], isError: true };
+                return {
+                    content: [{
+                        type: 'text',
+                        text: `Skill "${skillId}" not found. Try using search_skills with a simpler query, or get_categories to browse available skills.`
+                    }],
+                    isError: true
+                };
             }
             return { content: [{ type: 'text', text: JSON.stringify(skill, null, 2) }] };
         }
@@ -259,14 +296,20 @@ function createMcpServer(): McpServer {
             limit: z.number().optional().default(20),
         },
         async ({ query, limit = 20 }) => {
-            const results = searchSkills(query, limit);
+            // Use semanticSearch for multi-word query support
+            const results = semanticSearch(query, limit);
             return {
                 content: [{
                     type: 'text',
                     text: JSON.stringify({
                         query,
                         count: results.length,
-                        skills: results.map(s => ({ id: s.id, name: s.name, category: s.category })),
+                        skills: results.map(s => ({
+                            id: s.id,
+                            name: s.name,
+                            category: s.category,
+                            trustScore: s.trustScore
+                        })),
                     }, null, 2)
                 }],
             };
